@@ -12,7 +12,7 @@ from utils.args import opt
 
 
 class ITQAlgo:
-    bit = opt['bit']
+    bit = opt["bit"]
 
     def __init__(self, dim):
         self.dim = dim
@@ -23,8 +23,10 @@ class ITQAlgo:
 
         l, pc = np.linalg.eig(c)
 
-        l_pc_ordered = sorted(zip(l, pc.transpose()), key=lambda _p: _p[0], reverse=True)
-        pc_top = np.array([p[1] for p in l_pc_ordered[:self.bit]]).transpose()
+        l_pc_ordered = sorted(
+            zip(l, pc.transpose()), key=lambda _p: _p[0], reverse=True
+        )
+        pc_top = np.array([p[1] for p in l_pc_ordered[: self.bit]]).transpose()
 
         v = np.dot(train_features, pc_top)
 
@@ -42,13 +44,13 @@ class ITQAlgo:
 
         for i in range(n_iter):
             z = np.dot(v, r)
-            ux = np.ones(z.shape) * (-1.)
+            ux = np.ones(z.shape) * (-1.0)
             ux[z >= 0] = 1
             c = np.dot(ux.transpose(), v)
             ub, sigma, ua = np.linalg.svd(c)
             r = np.dot(ua, ub.transpose())
         z = np.dot(v, r)
-        b = np.ones(z.shape) * -1.
+        b = np.ones(z.shape) * -1.0
         b[z >= 0] = 1
         return b, r
 
@@ -63,7 +65,7 @@ class ITQAlgo:
         if isinstance(features, dict):
             codes = {}
             if mean_feature is None:
-                mean_feature = 0.
+                mean_feature = 0.0
             for video in features:
                 feature = features[video] - mean_feature
                 codes[video] = np.sign(np.dot(feature, self.w))

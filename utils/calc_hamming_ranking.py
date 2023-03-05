@@ -6,12 +6,11 @@
 # @Mail: qyjiang24@gmail.com
 # @Date: 19-10-16
 # +++++++++++++++++++++++++++++++++++++++++++++++++++
+import multiprocessing as mp
 import os
 import sys
 
 import numpy as np
-import multiprocessing as mp
-
 from sklearn.metrics import average_precision_score
 
 from .args import opt
@@ -35,7 +34,7 @@ class HammingRanking(object):
         self.verbose = verbose
         self.unlabeled_keys = unlabeled_keys
         self.codes = codes
-        self.num_procs = opt['num_procs']
+        self.num_procs = opt["num_procs"]
         aps = mp.Manager()
         self.aps = aps.list()
         self.verbose = verbose
@@ -43,11 +42,11 @@ class HammingRanking(object):
         self.input = mp.Queue()
 
         for idx in range(self.num_procs):
-            p = mp.Process(target=self.work, args=(idx, ))
+            p = mp.Process(target=self.work, args=(idx,))
             p.start()
             self.procs.append(p)
 
-        logger.info('init done.')
+        logger.info("init done.")
 
     def process(self, params):
         ind, video, groundtruth = params
@@ -67,7 +66,7 @@ class HammingRanking(object):
 
         ap = average_precision_score(y_true, y_score)
         if self.verbose:
-            logger.info('idx: {:5d}, ap: {:.4f}, video: {}'.format(ind, ap, video))
+            logger.info("idx: {:5d}, ap: {:.4f}, video: {}".format(ind, ap, video))
         return ap
 
     def work(self, idx):
@@ -82,7 +81,11 @@ class HammingRanking(object):
             except Exception as e:
                 exc_type, exc_obj, exc_tb = sys.exc_info()
                 fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-                logger.info('Exception Type: {}, Filename: {}, Line: {}'.format(exc_type, fname, exc_tb.tb_lineno))
+                logger.info(
+                    "Exception Type: {}, Filename: {}, Line: {}".format(
+                        exc_type, fname, exc_tb.tb_lineno
+                    )
+                )
                 raise print(e)
 
     def start(self, params):
@@ -100,7 +103,7 @@ class HammingRanking(object):
         for idx, proc in enumerate(self.procs):
             proc.join()
             if self.verbose:
-                logger.info('process: {} done'.format(idx))
+                logger.info("process: {} done".format(idx))
 
     def handle_result(self, result):
         self.aps.append(result)
@@ -116,7 +119,5 @@ def calc_hamming_ranking(codes, unlabeled_keys, gnds, verbose=None):
     hr.stop()
     map = hr.get_results()
 
-    logger.info('MAP: {:.4f}'.format(map))
+    logger.info("MAP: {:.4f}".format(map))
     return map
-
-

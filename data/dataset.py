@@ -7,10 +7,9 @@
 # @Date: 19-9-12
 # +++++++++++++++++++++++++++++++++++++++++++++++++++
 import torchvision.transforms as transforms
-
 from PIL import Image
-from torch.utils.data.dataset import Dataset
 from torch.utils.data import DataLoader
+from torch.utils.data.dataset import Dataset
 
 
 class ImageLoader(Dataset):
@@ -20,7 +19,7 @@ class ImageLoader(Dataset):
 
     def __getitem__(self, index):
         img = Image.open(self.images_paths[index])
-        img = img.convert('RGB')
+        img = img.convert("RGB")
         img = self.transform(img)
         return img, index
 
@@ -30,21 +29,19 @@ class ImageLoader(Dataset):
 
 def create_loader(images_paths, batch_size):
     normalize = transforms.Normalize(
-        mean=[0.485, 0.456, 0.406],
-        std=[0.229, 0.224, 0.225]
+        mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
     )
-    transformation = transforms.Compose([
-        transforms.Resize(256),
-        transforms.CenterCrop(224),
-        transforms.ToTensor(),
-        normalize
-    ])
+    transformation = transforms.Compose(
+        [
+            transforms.Resize(256),
+            transforms.CenterCrop(224),
+            transforms.ToTensor(),
+            normalize,
+        ]
+    )
 
     dataset = ImageLoader(images_paths, transformation)
-    dataloader = DataLoader(dataset,
-                            batch_size=batch_size,
-                            shuffle=False,
-                            num_workers=10)
+    dataloader = DataLoader(
+        dataset, batch_size=batch_size, shuffle=False, num_workers=10
+    )
     return dataloader
-
-

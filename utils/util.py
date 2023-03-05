@@ -7,21 +7,20 @@
 # @Date: 19-8-26
 # +++++++++++++++++++++++++++++++++++++++++++++++++++
 import os
-import h5py
-
-import numpy as np
-
 from collections import OrderedDict
+
+import h5py
+import numpy as np
 
 from utils.args import opt
 
 
-def load_features(featurepath, dtype='dict'):
-    if dtype == 'dict':
+def load_features(featurepath, dtype="dict"):
+    if dtype == "dict":
         features = {}
-        fo = h5py.File(featurepath, mode='r')
-        mean_feature = 0.
-        cnt = 0.
+        fo = h5py.File(featurepath, mode="r")
+        mean_feature = 0.0
+        cnt = 0.0
         for k in fo:
             feature = fo[k][()].squeeze().reshape(1, -1)
             mean_feature += feature
@@ -30,11 +29,11 @@ def load_features(featurepath, dtype='dict'):
         fo.close()
         mean_feature /= cnt
         return features, mean_feature
-    if dtype == 'array':
+    if dtype == "array":
         features = []
-        fo = h5py.File(featurepath, mode='r')
-        mean_feature = 0.
-        cnt = 0.
+        fo = h5py.File(featurepath, mode="r")
+        mean_feature = 0.0
+        cnt = 0.0
         for k in fo:
             feature = fo[k][()].squeeze().reshape(1, -1)
             mean_feature += feature
@@ -49,15 +48,15 @@ def load_features(featurepath, dtype='dict'):
 def get_video_id(dtype=None):
     if dtype is not None:
         videos = set()
-        filepath = os.path.join(opt['metadatapath'], dtype + '-id')
-        with open(filepath, 'r') as fp:
+        filepath = os.path.join(opt["metadatapath"], dtype + "-id")
+        with open(filepath, "r") as fp:
             for tmps in fp:
                 videos.add(tmps.strip())
         return videos
     else:
         videos = set()
-        filepath = os.path.join(opt['metadatapath'], 'all-video-id')
-        with open(filepath, 'r') as fp:
+        filepath = os.path.join(opt["metadatapath"], "all-video-id")
+        with open(filepath, "r") as fp:
             for tmps in fp:
                 videos.add(tmps.strip())
         return videos
@@ -65,12 +64,12 @@ def get_video_id(dtype=None):
 
 def load_groundtruth(filename=None):
     if filename is None:
-        filename = 'groundtruth'
-    filepath = os.path.join(opt['metadatapath'], filename)
+        filename = "groundtruth"
+    filepath = os.path.join(opt["metadatapath"], filename)
     gnds = OrderedDict()
-    with open(filepath, 'r') as fp:
+    with open(filepath, "r") as fp:
         for idx, lines in enumerate(fp):
-            tmps = lines.strip().split(' ')
+            tmps = lines.strip().split(" ")
             qid = tmps[0]
             cid = tmps[1]
             gt = int(tmps[-1])

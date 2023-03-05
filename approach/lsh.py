@@ -12,7 +12,7 @@ from utils.args import opt
 
 
 class LSHAlgo:
-    bit = opt['bit']
+    bit = opt["bit"]
 
     def __init__(self, dim):
         self.dim = dim

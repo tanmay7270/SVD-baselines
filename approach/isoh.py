@@ -13,7 +13,7 @@ from utils.args import opt
 
 
 class IsoHAlgo(object):
-    bit = opt['bit']
+    bit = opt["bit"]
 
     def __init__(self, dim):
         super(IsoHAlgo, self).__init__()
@@ -24,11 +24,15 @@ class IsoHAlgo(object):
         XX = np.cov(features.T)
 
         eigvals, eigvectors = np.linalg.eig(XX)
-        eigval_eigvec_sorted = sorted(zip(eigvals, eigvectors.transpose()), key=lambda _p: _p[0], reverse=True)
-        eigvectors_top = np.array([p[1] for p in eigval_eigvec_sorted[:self.bit]]).transpose()
+        eigval_eigvec_sorted = sorted(
+            zip(eigvals, eigvectors.transpose()), key=lambda _p: _p[0], reverse=True
+        )
+        eigvectors_top = np.array(
+            [p[1] for p in eigval_eigvec_sorted[: self.bit]]
+        ).transpose()
 
-        eigvals_top = np.array([p[0] for p in eigval_eigvec_sorted[:self.bit]])
-        m = np.diag(eigvals_top[:self.bit])
+        eigvals_top = np.array([p[0] for p in eigval_eigvec_sorted[: self.bit]])
+        m = np.diag(eigvals_top[: self.bit])
         q = self.__lift_projection__(m, 50)
         proj = eigvectors_top.dot(q)
         self.w = proj

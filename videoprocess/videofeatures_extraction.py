@@ -8,23 +8,25 @@
 # +++++++++++++++++++++++++++++++++++++++++++++++++++
 import os
 import sys
+
 import h5py
 
 parenddir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
 sys.path.append(parenddir)
 
-import numpy as np
 import multiprocessing as mp
 
-from utils.util import *
+import numpy as np
+
 from utils.args import opt
 from utils.logger import logger
+from utils.util import *
 
 
 class VideoFeatureExtractor(object):
     def __init__(self):
         self.procs = []
-        self.num_procs = opt['num_procs']
+        self.num_procs = opt["num_procs"]
 
         vfeatures = mp.Manager()
         self.vfeatures = vfeatures.dict()
@@ -32,7 +34,7 @@ class VideoFeatureExtractor(object):
         self.input = mp.Queue()
 
         for idx in range(self.num_procs):
-            p = mp.Process(target=self.worker, args=(idx, ))
+            p = mp.Process(target=self.worker, args=(idx,))
             p.start()
             self.procs.append(p)
 
@@ -43,8 +45,8 @@ class VideoFeatureExtractor(object):
         return X
 
     def normalization(self, params):
-        featurepath = os.path.join(opt['featurepath'], 'frames-features.h5')
-        fp = h5py.File(featurepath, mode='r')
+        featurepath = os.path.join(opt["featurepath"], "frames-features.h5")
+        fp = h5py.File(featurepath, mode="r")
         index, video = params[0], params[1]
         framefeatures = np.array(fp[video][()]).squeeze()
         if framefeatures.ndim == 1:
@@ -55,7 +57,7 @@ class VideoFeatureExtractor(object):
         vfeature = self.__normalize__(vfeature)
         self.vfeatures[video] = vfeature
         if index % 10000 == 0:
-            logger.info('index: {:6d}, video: {}'.format(index, video))
+            logger.info("index: {:6d}, video: {}".format(index, video))
         fp.close()
 
     def worker(self, idx):
@@ -67,7 +69,7 @@ class VideoFeatureExtractor(object):
             try:
                 self.normalization(params)
             except Exception as e:
-                logger.info('Exception: {}. video: {}'.format(e, params[1]))
+                logger.info("Exception: {}. video: {}".format(e, params[1]))
 
     def start(self, videolists):
         for idx, video in enumerate(videolists):
@@ -77,32 +79,32 @@ class VideoFeatureExtractor(object):
     def stop(self):
         for idx, proc in enumerate(self.procs):
             proc.join()
-            logger.info('process: {} is done.'.format(idx))
+            logger.info("process: {} is done.".format(idx))
 
     def save_features(self):
         vfeatures = dict(self.vfeatures)
-        vfeaturepath = os.path.join(opt['featurepath'], 'videos-features.h5')
-        fp = h5py.File(vfeaturepath, mode='w')
+        vfeaturepath = os.path.join(opt["featurepath"], "videos-features.h5")
+        fp = h5py.File(vfeaturepath, mode="w")
         for video in vfeatures:
             feature = vfeatures[video]
             fp.create_dataset(name=video, data=feature)
         fp.close()
-        logger.info('saving feature done')
+        logger.info("saving feature done")
 
 
 def main():
     vfe = VideoFeatureExtractor()
     videos = get_video_id()
-    logger.info('#video: {}'.format(len(videos)))
+    logger.info("#video: {}".format(len(videos)))
     vfe.start(videos)
     vfe.stop()
     vfe.save_features()
-    logger.info('all done')
+    logger.info("all done")
 
 
 if __name__ == "__main__":
     main()
 
-'''bash
+"""bash
 python videoprocess/videofeatures_extraction.py --dataname svd-example
-'''
+"""

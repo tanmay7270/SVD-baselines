@@ -8,16 +8,13 @@
 # +++++++++++++++++++++++++++++++++++++++++++++++++++
 import logging
 import os
-
 from logging import handlers
 
 from utils.args import opt
 
 
 class Logger(object):
-    def __init__(self,
-                 fmt='[%(asctime)s][%(levelname)s]: %(message)s'
-                 ):
+    def __init__(self, fmt="[%(asctime)s][%(levelname)s]: %(message)s"):
         self.logger = logging.getLogger()
         format_str = logging.Formatter(fmt)
         self.logger.setLevel(logging.INFO)
@@ -25,11 +22,11 @@ class Logger(object):
         sh.setFormatter(format_str)
         self.logger.addHandler(sh)
 
-        if opt['en_local_log']:
-            logfile = os.path.join(opt['logdir'], 'log.log')
-            th = handlers.TimedRotatingFileHandler(filename=logfile,
-                                                   when='D',
-                                                   backupCount=3)
+        if opt["en_local_log"]:
+            logfile = os.path.join(opt["logdir"], "log.log")
+            th = handlers.TimedRotatingFileHandler(
+                filename=logfile, when="D", backupCount=3
+            )
             th.setFormatter(format_str)
             self.logger.addHandler(th)
 
@@ -48,14 +45,15 @@ class Logger(object):
 
 logger = Logger()
 for key in opt:
-    logger.info('param: {}: {}'.format(key, opt[key]))
+    logger.info("param: {}: {}".format(key, opt[key]))
 
-logger.info('---------------------------------load param done---------------------------------')
+logger.info(
+    "---------------------------------load param done---------------------------------"
+)
 
-if opt['en_local_log']:
+if opt["en_local_log"]:
     import yaml
-    paramfile = os.path.join(opt['logdir'], 'param.yaml')
-    with open(paramfile, 'w') as fp:
+
+    paramfile = os.path.join(opt["logdir"], "param.yaml")
+    with open(paramfile, "w") as fp:
         yaml.dump(opt, fp)
-
-

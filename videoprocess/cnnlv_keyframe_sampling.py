@@ -6,25 +6,27 @@
 # @Mail: qyjiang24@gmail.com
 # @Date: 19-8-25
 # +++++++++++++++++++++++++++++++++++++++++++++++++++
-import sys
 import os
+import sys
+
 import h5py
 
 parentddir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
 sys.path.append(parentddir)
 
-import numpy as np
 import multiprocessing as mp
 
-from utils.util import get_video_id
+import numpy as np
+
 from utils.args import opt
 from utils.logger import logger
+from utils.util import get_video_id
 
 
 class CNNLVFrameSampler(object):
     def __init__(self, pos_labeled_keys=None):
         self.procs = []
-        self.num_procs = opt['num_procs']
+        self.num_procs = opt["num_procs"]
         self.pos_labeled_keys = pos_labeled_keys
 
         features = mp.Manager()
@@ -33,7 +35,7 @@ class CNNLVFrameSampler(object):
         self.input = mp.Queue()
 
         for idx in range(self.num_procs):
-            p = mp.Process(target=self.work, args=(idx, ))
+            p = mp.Process(target=self.work, args=(idx,))
             p.start()
             self.procs.append(p)
 
@@ -44,14 +46,14 @@ class CNNLVFrameSampler(object):
         return X
 
     def reading(self, params):
-        featurepath = os.path.join(opt['featurepath'], 'frames-features.h5')
-        fp = h5py.File(featurepath, mode='r')
+        featurepath = os.path.join(opt["featurepath"], "frames-features.h5")
+        fp = h5py.File(featurepath, mode="r")
         idx, video = params[0], params[1]
         feature = np.array(fp[video][()]).squeeze().reshape(-1, 4096)
         self.features.append(feature)
         fp.close()
         if idx % 10000 == 0:
-            logger.info('idx: {:6d}, video: {}'.format(idx, video))
+            logger.info("idx: {:6d}, video: {}".format(idx, video))
 
     def work(self, idx):
         while True:
@@ -62,7 +64,7 @@ class CNNLVFrameSampler(object):
             try:
                 self.reading(params)
             except Exception as e:
-                logger.info('Exception: {}, wrong video: {}'.format(idx, params[1]))
+                logger.info("Exception: {}, wrong video: {}".format(idx, params[1]))
 
     def start(self, video_lists):
         for idx, video in enumerate(video_lists):
@@ -78,29 +80,29 @@ class CNNLVFrameSampler(object):
         features = np.concatenate(features)
         num_frames = features.shape[0]
         ind = np.random.permutation(num_frames)
-        features = features[ind[0: opt['num_key_frames']]]
+        features = features[ind[0 : opt["num_key_frames"]]]
         mean_feature = np.mean(features, axis=0)
         return features, mean_feature
 
 
 def main():
-    video_lists = get_video_id(dtype='labeled-data')
+    video_lists = get_video_id(dtype="labeled-data")
     pos_video_lists = None
     cfs = CNNLVFrameSampler(pos_video_lists)
     cfs.start(video_lists)
     cfs.stop()
     features, mean_feature = cfs.get_results()
-    filepath = os.path.join(opt['featurepath'], 'cnnlv-sampling-features.h5')
-    fp = h5py.File(filepath, mode='w')
-    fp.create_dataset(name='features', data=features)
-    fp.create_dataset(name='mean_features', data=mean_feature)
+    filepath = os.path.join(opt["featurepath"], "cnnlv-sampling-features.h5")
+    fp = h5py.File(filepath, mode="w")
+    fp.create_dataset(name="features", data=features)
+    fp.create_dataset(name="mean_features", data=mean_feature)
     fp.close()
-    logger.info('all done')
+    logger.info("all done")
 
 
 if __name__ == "__main__":
     main()
 
-'''bash
+"""bash
 python videoprocess/cnnlv_keyframe_sampling.py --dataname svd --approach cfs
-'''
+"""

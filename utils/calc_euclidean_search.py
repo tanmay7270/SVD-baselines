@@ -6,11 +6,10 @@
 # @Mail: qyjiang24@gmail.com
 # @Date: 19-9-15
 # +++++++++++++++++++++++++++++++++++++++++++++++++++
+import multiprocessing as mp
 import os
 
 import numpy as np
-import multiprocessing as mp
-
 from scipy.spatial.distance import euclidean
 from sklearn.metrics import average_precision_score
 
@@ -28,12 +27,12 @@ class EuclideanSearch(object):
         self.aps = aps.list()
 
         self.input = mp.Queue()
-        self.num_procs = opt['num_procs']
+        self.num_procs = opt["num_procs"]
         self.procs = []
         self.verbose = verbose
 
         for idx in range(self.num_procs):
-            p = mp.Process(target=self.worker, args=(idx, ))
+            p = mp.Process(target=self.worker, args=(idx,))
             p.start()
             self.procs.append(p)
 
@@ -47,7 +46,7 @@ class EuclideanSearch(object):
                 ap = self.calc_ap(params)
                 self.aps.append(ap)
             except Exception as e:
-                logger.info('Exception: {}.'.format(e))
+                logger.info("Exception: {}.".format(e))
 
     def calc_ap(self, params):
         index, video, gnd = params[0], params[1], params[2]
@@ -67,7 +66,7 @@ class EuclideanSearch(object):
 
         ap = average_precision_score(y_true, y_score)
         if self.verbose:
-            logger.info('ap: {:.4f}@idx: {}, video: {}.'.format(ap, index, video))
+            logger.info("ap: {:.4f}@idx: {}, video: {}.".format(ap, index, video))
         return ap
 
     def start(self, gnds):
@@ -94,5 +93,3 @@ def calc_euclidean_search(features, unlabeled_keys, gnds, verbose=None):
     es.stop()
     map = es.get_results()
     return map
-
-
