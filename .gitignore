@@ -1,3 +1,5 @@
+# Ignore dataset downloader
+SVD-download/*
 # Ignore .vscode
 .vscode
 

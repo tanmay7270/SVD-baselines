@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "svd-baselines"
+version = "0.1.0"
+description = "implementation of baselines for the SVD dataset"
+authors = ["Tanmay Agrawal <tanmayagrawa@umass.edu>"]
+readme = "README.md"
+packages = [{include = "svd_baselines"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+torch = "^1.13.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
