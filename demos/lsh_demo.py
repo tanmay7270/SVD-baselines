@@ -44,7 +44,7 @@ def main():
     # load groundtruth and unlabeled-keys
     gnds = load_groundtruth("test_groundtruth")
     unlabeled_keys = get_video_id("unlabeled-data")
-    logger.info("loading gnds and unlabeled keys done. #query: {}".format(len(gnds)))
+    logger.info(f"loading gnds and unlabeled keys done. #query: {len(gnds)}")
 
     # calculate map
     map = calc_hamming_ranking(codes, unlabeled_keys, gnds)

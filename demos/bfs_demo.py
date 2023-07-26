@@ -22,10 +22,8 @@ from utils.util import get_video_id, load_groundtruth
 
 def load_features():
     filepath = os.path.join(opt["featurepath"], "videos-features.h5")
-    features = {}
     fp = h5py.File(filepath, mode="r")
-    for k in fp:
-        features[k] = fp[k][()]
+    features = {k: fp[k][()] for k in fp}
     fp.close()
     return features
 
@@ -33,12 +31,12 @@ def load_features():
 def main():
     # load features
     features = load_features()
-    logger.info("loading features done. #videos: {}".format(len(features)))
+    logger.info(f"loading features done. #videos: {len(features)}")
 
     # load groundtruth and unlabeled-keys
     gnds = load_groundtruth("test_groundtruth")
     unlabeled_keys = get_video_id("unlabeled-data")
-    logger.info("load gnds and unlabeled keys done. #query: {}".format(len(gnds)))
+    logger.info(f"load gnds and unlabeled keys done. #query: {len(gnds)}")
 
     # calculate map
     map = calc_euclidean_search(features, unlabeled_keys, gnds)

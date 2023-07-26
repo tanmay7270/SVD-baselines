@@ -43,7 +43,7 @@ def create_image_list():
     num_processing = 0.0
     for idx, video in enumerate(videos):
         frame_path = os.path.join(opt["framepath"], video)
-        feature_path = os.path.join(opt["featurepath"], video + ".h5")
+        feature_path = os.path.join(opt["featurepath"], f"{video}.h5")
         if not os.path.exists(feature_path):
             image_paths = __load_image_paths__(frame_path)
             if len(image_paths) < 1:
@@ -59,7 +59,7 @@ def create_image_list():
 def check_images(image_paths):
     for imagepath in image_paths:
         if not os.path.join(imagepath):
-            logger.info("file: {} not found".format(imagepath))
+            logger.info(f"file: {imagepath} not found")
             return False
     return True
 
@@ -95,46 +95,42 @@ def deep_feature_extraction():
             buffer += features
             if current_len >= cutoffs[count][0]:
                 while True:
-                    if count < len(cutoffs) and len(buffer) >= cutoffs[count][0]:
-                        offset = cutoffs[count][0]
-
-                        next_video = ""
-                        try:
-                            curr_ind = ind[0] - len(buffer) + len(features) + offset - 1
-                            next_ind = curr_ind + 1
-
-                            curr_video = images_paths[curr_ind].split("/")[-2]
-                            next_video = images_paths[next_ind].split("/")[-2]
-                            if curr_video == next_video:
-                                logger.info(
-                                    "Split Error: {}/{}".format(curr_video, next_video)
-                                )
-                                return
-                        except:
-                            pass
-
-                        save_features = buffer[:offset]
-                        if not len(save_features) == cutoffs[count][0]:
-                            logger.info(
-                                "Length Error: {}/{}".format(
-                                    len(save_features), cutoffs[count][0]
-                                )
-                            )
-                            return
-                        save_features = np.array(save_features)
-                        video = cutoffs[count][1]
-                        fw.create_dataset(name=video, data=save_features)
-                        if opt["verbose"] and count % opt["output_period"] == 0:
-                            logger.info(
-                                "CNT: {:6d}/{:6d}, Video: {}, Next Video: {}".format(
-                                    count, len(cutoffs), video, next_video
-                                )
-                            )
-
-                        buffer = buffer[offset:]
-                        count += 1
-                    else:
+                    if (
+                        count >= len(cutoffs)
+                        or len(buffer) < cutoffs[count][0]
+                    ):
                         break
+                    offset = cutoffs[count][0]
+
+                    next_video = ""
+                    try:
+                        curr_ind = ind[0] - len(buffer) + len(features) + offset - 1
+                        next_ind = curr_ind + 1
+
+                        curr_video = images_paths[curr_ind].split("/")[-2]
+                        next_video = images_paths[next_ind].split("/")[-2]
+                        if curr_video == next_video:
+                            logger.info(f"Split Error: {curr_video}/{next_video}")
+                            return
+                    except:
+                        pass
+
+                    save_features = buffer[:offset]
+                    if len(save_features) != cutoffs[count][0]:
+                        logger.info(f"Length Error: {len(save_features)}/{cutoffs[count][0]}")
+                        return
+                    save_features = np.array(save_features)
+                    video = cutoffs[count][1]
+                    fw.create_dataset(name=video, data=save_features)
+                    if opt["verbose"] and count % opt["output_period"] == 0:
+                        logger.info(
+                            "CNT: {:6d}/{:6d}, Video: {}, Next Video: {}".format(
+                                count, len(cutoffs), video, next_video
+                            )
+                        )
+
+                    buffer = buffer[offset:]
+                    count += 1
     fw.close()
 
 

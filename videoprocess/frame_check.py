@@ -48,7 +48,7 @@ class FrameChecker:
             self.failed_log.append(video)
             return
         jpgflag = True
-        for idx in range(num_frames):
+        for _ in range(num_frames):
             jpgfile = os.path.join(framepath, "{:04d}.jpg".format(index))
             if not os.path.exists(jpgfile):
                 jpgflag = False
@@ -66,7 +66,7 @@ class FrameChecker:
             try:
                 self.frame_checker(params)
             except Exception as e:
-                logger.info("Exception: {}.".format(e))
+                logger.info(f"Exception: {e}.")
 
     def start(self, videos):
         for idx, video in enumerate(videos):
@@ -76,21 +76,20 @@ class FrameChecker:
     def stop(self):
         for idx, proc in enumerate(self.procs):
             proc.join()
-            logger.info("process: {} done".format(idx))
+            logger.info(f"process: {idx} done")
 
     def get_results(self):
-        failed_log = list(self.failed_log)
-        if len(failed_log) > 0:
+        if failed_log := list(self.failed_log):
             filepath = os.path.join(opt["infopath"], "failed-log")
             with open(filepath, "w") as fp:
-                for idx, failed in enumerate(failed_log):
-                    logger.info("video: {} failed.".format(failed))
+                for failed in failed_log:
+                    logger.info(f"video: {failed} failed.")
                     fp.write(failed + "\n")
 
 
 def main():
     videos = list(get_video_id())
-    logger.info("#{} videos need to be processed".format(len(videos)))
+    logger.info(f"#{len(videos)} videos need to be processed")
 
     fc = FrameChecker()
     fc.start(videos)

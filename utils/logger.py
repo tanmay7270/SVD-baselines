@@ -45,7 +45,7 @@ class Logger(object):
 
 logger = Logger()
 for key in opt:
-    logger.info("param: {}: {}".format(key, opt[key]))
+    logger.info(f"param: {key}: {opt[key]}")
 
 logger.info(
     "---------------------------------load param done---------------------------------"

@@ -79,7 +79,7 @@ class VideoDuration(object):
 
             except Exception as e:
                 self.failed_videos.append(video)
-                logger.info("Exception: {}, wrong video: {}".format(e, video))
+                logger.info(f"Exception: {e}, wrong video: {video}")
 
     def start(self, videos):
         for idx, video in enumerate(videos):
@@ -89,7 +89,7 @@ class VideoDuration(object):
     def stop(self):
         for idx, proc in enumerate(self.procs):
             proc.join()
-            logger.info("process: {} done.".format(idx))
+            logger.info(f"process: {idx} done.")
 
     def get_results(self):
         durations = dict(self.durations)
@@ -103,7 +103,7 @@ class VideoDuration(object):
             )
         )
 
-        if len(failed_videos) > 0:
+        if failed_videos:
             logger.info("#{:6d} videos are failed.".format(len(failed_videos)))
             with open(os.path.join(opt["infopath"], "duration-failed.log"), "w") as fp:
                 for video in failed_videos:

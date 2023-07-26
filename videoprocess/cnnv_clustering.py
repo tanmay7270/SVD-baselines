@@ -46,8 +46,7 @@ def cnnv_clustering():
     end_t = time.time() - start_t
     logger.info("clustering done. time: {:.4f}(m)".format(end_t / 60))
 
-    centers = kmeans.cluster_centers_
-    return centers
+    return kmeans.cluster_centers_
 
 
 def main():

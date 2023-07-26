@@ -22,8 +22,7 @@ class LSHAlgo:
         if isinstance(features, np.ndarray):
             if mean_feature is not None:
                 features = features - mean_feature
-            codes = np.sign(np.dot(features, self.w))
-            return codes
+            return np.sign(np.dot(features, self.w))
         if isinstance(features, dict):
             codes = {}
             for video in features:

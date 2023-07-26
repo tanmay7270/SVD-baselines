@@ -41,7 +41,6 @@ def create_loader(images_paths, batch_size):
     )
 
     dataset = ImageLoader(images_paths, transformation)
-    dataloader = DataLoader(
+    return DataLoader(
         dataset, batch_size=batch_size, shuffle=False, num_workers=10
     )
-    return dataloader

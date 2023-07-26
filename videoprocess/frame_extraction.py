@@ -55,7 +55,7 @@ class FrameExtractor:
             if num_frame > 0:
                 return num_frame, frames
         except Exception as e:
-            print("Exception: {} (cv2)".format(e))
+            print(f"Exception: {e} (cv2)")
             return None
 
     @staticmethod
@@ -73,7 +73,7 @@ class FrameExtractor:
             if num_frame > 0:
                 return num_frame, frames
         except Exception as e:
-            print("Exception: {} (ffmpeg)".format(e))
+            print(f"Exception: {e} (ffmpeg)")
             return None
 
     def frame_extractor(self, params):
@@ -105,7 +105,7 @@ class FrameExtractor:
                             )
                         )
                 else:
-                    logger.info("processing video: {} failed".format(video))
+                    logger.info(f"processing video: {video} failed")
             for ind, frame in enumerate(frames):
                 _framepath = os.path.join(framepath, "{:04d}.jpg".format(ind))
                 cv2.imwrite(_framepath, frame)
@@ -114,7 +114,7 @@ class FrameExtractor:
             fw.create_dataset(name="num_frames", data=num_frame)
             fw.close()
         except Exception as e:
-            logger.info("Exception: {}, video: {}".format(e, video))
+            logger.info(f"Exception: {e}, video: {video}")
 
     def worker(self, idx):
         while True:
@@ -125,7 +125,7 @@ class FrameExtractor:
             try:
                 self.frame_extractor(params)
             except Exception as e:
-                logger.info("Exception: {}.".format(e))
+                logger.info(f"Exception: {e}.")
 
     def start(self, videos):
         for idx, video in enumerate(videos):
@@ -135,12 +135,12 @@ class FrameExtractor:
     def stop(self):
         for idx, proc in enumerate(self.procs):
             proc.join()
-            logger.info("process: {} done".format(idx))
+            logger.info(f"process: {idx} done")
 
 
 def main():
     videos = list(get_video_id())
-    logger.info("#{} videos need to be processed".format(len(videos)))
+    logger.info(f"#{len(videos)} videos need to be processed")
 
     fe = FrameExtractor(verbose=opt["verbose"])
     fe.start(videos)

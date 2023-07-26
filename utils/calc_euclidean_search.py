@@ -46,20 +46,20 @@ class EuclideanSearch(object):
                 ap = self.calc_ap(params)
                 self.aps.append(ap)
             except Exception as e:
-                logger.info("Exception: {}.".format(e))
+                logger.info(f"Exception: {e}.")
 
     def calc_ap(self, params):
         index, video, gnd = params[0], params[1], params[2]
         query_feature = self.features[video]
 
         y_true, y_score = [], []
-        for idx, cid in enumerate(gnd):
+        for cid in gnd:
             g = gnd[cid]
             s = euclidean(self.features[cid], query_feature)
             y_true.append(g)
             y_score.append(-s)
 
-        for idx, uid in enumerate(self.unlabeled_keys):
+        for uid in self.unlabeled_keys:
             s = euclidean(self.features[uid], query_feature)
             y_score.append(-s)
             y_true.append(0)
@@ -79,17 +79,15 @@ class EuclideanSearch(object):
         for idx, proc in enumerate(self.procs):
             proc.join()
             if self.verbose:
-                logger.info("process: {} done".format(idx))
+                logger.info(f"process: {idx} done")
 
     def get_results(self):
         aps = list(self.aps)
-        map = np.mean(np.array(aps))
-        return map
+        return np.mean(np.array(aps))
 
 
 def calc_euclidean_search(features, unlabeled_keys, gnds, verbose=None):
     es = EuclideanSearch(features, unlabeled_keys, verbose=verbose)
     es.start(gnds)
     es.stop()
-    map = es.get_results()
-    return map
+    return es.get_results()

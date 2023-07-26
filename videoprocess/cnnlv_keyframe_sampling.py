@@ -64,7 +64,7 @@ class CNNLVFrameSampler(object):
             try:
                 self.reading(params)
             except Exception as e:
-                logger.info("Exception: {}, wrong video: {}".format(idx, params[1]))
+                logger.info(f"Exception: {idx}, wrong video: {params[1]}")
 
     def start(self, video_lists):
         for idx, video in enumerate(video_lists):
@@ -80,7 +80,7 @@ class CNNLVFrameSampler(object):
         features = np.concatenate(features)
         num_frames = features.shape[0]
         ind = np.random.permutation(num_frames)
-        features = features[ind[0 : opt["num_key_frames"]]]
+        features = features[ind[:opt["num_key_frames"]]]
         mean_feature = np.mean(features, axis=0)
         return features, mean_feature
 

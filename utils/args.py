@@ -75,7 +75,7 @@ def load_config(filepath):
     return config
 
 
-cfg_file = os.path.join(args.configpath, args.configfile + ".yaml")
+cfg_file = os.path.join(args.configpath, f"{args.configfile}.yaml")
 opt = load_config(cfg_file)
 
 args = vars(args)

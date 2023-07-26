@@ -46,14 +46,9 @@ class VGG(nn.Module):
                 x = m(x)
                 f = self.mac_pool(x).view(x.size(0), -1)
                 feature.append(f)
-            if (
-                isinstance(m, nn.ReLU)
-                or isinstance(m, nn.BatchNorm2d)
-                or isinstance(m, nn.MaxPool2d)
-            ):
+            if isinstance(m, (nn.ReLU, nn.BatchNorm2d, nn.MaxPool2d)):
                 x = m(x)
-        feature = torch.cat(feature, dim=1)
-        return feature
+        return torch.cat(feature, dim=1)
 
 
 def make_layers(cfg, batch_norm=False):

@@ -6,19 +6,18 @@ import threading
 
 
 server_path = 'http://vireo.cs.cityu.edu.hk/webvideo/'
-videos_path = server_path + 'videos/'
-keyframes_path = server_path + 'Keyframes/'
+videos_path = f'{server_path}videos/'
+keyframes_path = f'{server_path}Keyframes/'
 
 
 def download_url(url, to_save, try_time=10, miss_file=''):
-    for i in range(0, try_time):
+    for _ in range(0, try_time):
         try:
-            if not os.path.exists(to_save):
-                request.urlretrieve(url, to_save)
-                return 0
-            else:
+            if os.path.exists(to_save):
                 # print(to_save, ' exists.')
                 return 1
+            request.urlretrieve(url, to_save)
+            return 0
         except:
             continue
     with open(miss_file, 'a') as f:
@@ -31,8 +30,7 @@ def read_file_info(file_path):
     infos = []
     with open(file_path, 'r') as f:
         lines = f.readlines()
-        for line in lines:
-            infos.append(line.rstrip('\n').split('\t'))
+        infos.extend(line.rstrip('\n').split('\t') for line in lines)
     return infos
 
 
@@ -53,7 +51,7 @@ def download_videos(infos, num_thread):
             os.makedirs(path_save_video + QueryID, exist_ok=True)
             to_save = path_save_video + QueryID + '/' + VideoName
             ret = download_url(url, to_save, miss_file='miss_video.txt')
-            if ret == 0 or ret == 1:
+            if ret in [0, 1]:
                 # print(to_save, ' saved.')
                 pbar.update(1)
 
@@ -85,7 +83,7 @@ def download_Keyframes(infos, num_thread):
             os.makedirs(path_save_keyframes + KID, exist_ok=True)
             to_save = path_save_keyframes + KID + '/' + KeyframeName + '.jpg'
             ret = download_url(url, to_save, miss_file='miss_keyframe.txt')
-            if ret == 0 or ret == 1:
+            if ret in [0, 1]:
                 # print(to_save, ' saved.')
                 pbar.update(1)
 
@@ -111,8 +109,8 @@ parser.add_argument('--no_videos', action="store_false",
 args = parser.parse_args()
 save_path = args.save_path
 num_thread = args.num_thread
-path_save_video = save_path + 'videos/'
-path_save_keyframes = save_path + 'Keyframes/'
+path_save_video = f'{save_path}videos/'
+path_save_keyframes = f'{save_path}Keyframes/'
 if args.no_keyframes:
     keyframe_infos = read_file_info('Shot_Info.txt')
     download_Keyframes(keyframe_infos, num_thread)

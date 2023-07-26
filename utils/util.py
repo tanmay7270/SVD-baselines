@@ -41,25 +41,20 @@ def load_features(featurepath, dtype="dict"):
             features.append(feature)
         fo.close()
         mean_feature /= cnt
-        features = np.array(features).squeeze() - mean_feature
-        return features
+        return np.array(features).squeeze() - mean_feature
 
 
 def get_video_id(dtype=None):
+    videos = set()
     if dtype is not None:
-        videos = set()
-        filepath = os.path.join(opt["metadatapath"], dtype + "-id")
-        with open(filepath, "r") as fp:
-            for tmps in fp:
-                videos.add(tmps.strip())
-        return videos
+        filepath = os.path.join(opt["metadatapath"], f"{dtype}-id")
     else:
-        videos = set()
         filepath = os.path.join(opt["metadatapath"], "all-video-id")
-        with open(filepath, "r") as fp:
-            for tmps in fp:
-                videos.add(tmps.strip())
-        return videos
+
+    with open(filepath, "r") as fp:
+        for tmps in fp:
+            videos.add(tmps.strip())
+    return videos
 
 
 def load_groundtruth(filename=None):
@@ -68,7 +63,7 @@ def load_groundtruth(filename=None):
     filepath = os.path.join(opt["metadatapath"], filename)
     gnds = OrderedDict()
     with open(filepath, "r") as fp:
-        for idx, lines in enumerate(fp):
+        for lines in fp:
             tmps = lines.strip().split(" ")
             qid = tmps[0]
             cid = tmps[1]

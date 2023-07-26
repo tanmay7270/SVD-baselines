@@ -53,7 +53,7 @@ class HammingRanking(object):
         y_true = []
         y_score = []
 
-        for idx, cid in enumerate(groundtruth):
+        for cid in groundtruth:
             y_true.append(groundtruth[cid])
             y_score.append(-__hamming_dist__(self.codes[video], self.codes[cid]))
 
@@ -82,9 +82,7 @@ class HammingRanking(object):
                 exc_type, exc_obj, exc_tb = sys.exc_info()
                 fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
                 logger.info(
-                    "Exception Type: {}, Filename: {}, Line: {}".format(
-                        exc_type, fname, exc_tb.tb_lineno
-                    )
+                    f"Exception Type: {exc_type}, Filename: {fname}, Line: {exc_tb.tb_lineno}"
                 )
                 raise print(e)
 
@@ -103,7 +101,7 @@ class HammingRanking(object):
         for idx, proc in enumerate(self.procs):
             proc.join()
             if self.verbose:
-                logger.info("process: {} done".format(idx))
+                logger.info(f"process: {idx} done")
 
     def handle_result(self, result):
         self.aps.append(result)

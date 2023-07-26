@@ -69,7 +69,7 @@ class VideoFeatureExtractor(object):
             try:
                 self.normalization(params)
             except Exception as e:
-                logger.info("Exception: {}. video: {}".format(e, params[1]))
+                logger.info(f"Exception: {e}. video: {params[1]}")
 
     def start(self, videolists):
         for idx, video in enumerate(videolists):
@@ -79,14 +79,13 @@ class VideoFeatureExtractor(object):
     def stop(self):
         for idx, proc in enumerate(self.procs):
             proc.join()
-            logger.info("process: {} is done.".format(idx))
+            logger.info(f"process: {idx} is done.")
 
     def save_features(self):
         vfeatures = dict(self.vfeatures)
         vfeaturepath = os.path.join(opt["featurepath"], "videos-features.h5")
         fp = h5py.File(vfeaturepath, mode="w")
-        for video in vfeatures:
-            feature = vfeatures[video]
+        for video, feature in vfeatures.items():
             fp.create_dataset(name=video, data=feature)
         fp.close()
         logger.info("saving feature done")
@@ -95,7 +94,7 @@ class VideoFeatureExtractor(object):
 def main():
     vfe = VideoFeatureExtractor()
     videos = get_video_id()
-    logger.info("#video: {}".format(len(videos)))
+    logger.info(f"#video: {len(videos)}")
     vfe.start(videos)
     vfe.stop()
     vfe.save_features()

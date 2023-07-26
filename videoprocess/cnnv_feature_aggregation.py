@@ -85,7 +85,7 @@ class CNNVFeatureAggregation(object):
                 video, features = self.feature_aggregations(params)
                 self.features[video] = features
             except Exception as e:
-                logger.info("Exception: {}".format(e))
+                logger.info(f"Exception: {e}")
 
     def start(self, video_lists):
         for idx, video in enumerate(video_lists):
@@ -105,7 +105,7 @@ class CNNVFeatureAggregation(object):
         for video in features:
             fp.create_dataset(name=video, data=features[video])
         fp.close()
-        logger.info("cnnv aggregated features are save to:{}".format(filepath))
+        logger.info(f"cnnv aggregated features are save to:{filepath}")
 
 
 def main():
